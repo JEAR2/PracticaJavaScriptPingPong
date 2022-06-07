@@ -1,3 +1,4 @@
+//Clase que permite crear el tablero para dibujar el juego con sus atributos
 (function(){
      self.Board  = function(width,height){
         this.width = width;
@@ -10,6 +11,7 @@
     }
 
     self.Board.prototype = {
+        //función que permite recorer y almacenar tato las barras del juego como la pelota
         get elements(){
             var elements = this.bars.map(function(bar){return bar;});
              elements.push(this.ball);
@@ -18,6 +20,7 @@
     }
 })();
 
+//Clase Bar que permite crear las barras con sus atributos 
 (function(){
     self.Bar = function(x,y,width,height,board){
         this.x = x;
@@ -46,6 +49,8 @@
 
     }
 })();
+
+//Clase Ball, permite crear la pelota con todos sus atributos
 (function(){
     self.Ball = function(x,y,radius,board){
         this.x = x;
@@ -76,6 +81,7 @@
         get height(){
             return this.radius * 2;
         },
+        //función que permite redireccionar la pelota al momento de hacer una colisión con las barras
         collision: function(bar){
             var relative_intersect_y = (bar.y + (bar.height/2))-this.y;
             var normalized_intersect_y = relative_intersect_y / (bar.height/2);
@@ -91,6 +97,7 @@
     }
 })();
 
+//Clase BoardView, permite ver en pantalla los graficos necesarios para la interaccción con el usuario 
 (function(){
     self.BoardView = function(canvas,board){
         this.canvas = canvas;
@@ -102,15 +109,19 @@
     }
 
     self.BoardView.prototype = {
+        //Función que limpia los elementos del tablero para que este sea dinamico
         clean: function(){
             this.ctx.clearRect(0,0,this.board.width,this.board.height)
         },
+        //Función que dibuja en pantalla los elementos
         draw: function(){
             for(var i=this.board.elements.length - 1;i>=0;i--){
                 var el = this.board.elements[i];
                 draw(this.ctx,el);
             }
         },
+
+        //Función que verifica si la pelota colisiona con las barras
         check_collisions: function(){
             
             for (var i = this.board.bars.length - 1; i >=0;  i--) {
@@ -121,6 +132,8 @@
                 
             }
         },
+
+        //Función que inicia y mantiene en funcionamiento el juego
         play: function(){
             if(this.board.playing){
                 this.clean();
@@ -132,6 +145,7 @@
         }
     }
 
+    //Función que mantiene y verifica las colisiones para redireccionar la pelota
     function hit(a,b){
         var hit = false;
         //colisiones horizontales
@@ -160,6 +174,7 @@
         return hit;
     }
 
+    //Función que imprime en pantalla tanto el tablero como la pelota del juego 
     function draw(ctx,element){
        
             switch(element.kind){
@@ -180,6 +195,7 @@
     }
 })();
 
+//Creacion de objetos 
 var board = new Board(800,400);
 var bar = new Bar(20,100,40,100,board);
 var bar2 = new Bar(735,100,40,100,board);
@@ -187,7 +203,7 @@ var canvas = document.getElementById("canvas");
 var board_view = new BoardView(canvas,board);
 var ball = new Ball(350,100,10,board);
 
-
+//Dinamica de los botones pulsados por el usuario
 document.addEventListener("keydown",function(ev){
     if(ev.key === "ArrowUp"){
         ev.preventDefault();
@@ -212,6 +228,7 @@ document.addEventListener("keydown",function(ev){
 board_view.draw();
 window.requestAnimationFrame(controller);
 
+//Función que permite iniciar y lanzar cada componente para su funcionamiento 
 function controller(){
     board_view.clean();
     board_view.play();
